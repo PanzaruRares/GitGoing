@@ -63,3 +63,18 @@ interactive shell. Available commands:
 - `pwd`, `help`, `clear`, `exit`
 
 Course pages are available at `/courses/<course>`, including `/courses/java`.
+
+## Publish a static preview on GitHub Pages
+
+The repository includes a GitHub Actions workflow that builds and deploys the
+frontend to `https://panzarurares.github.io/GitGoing/` whenever changes are
+pushed to `main`. In the GitHub repository, open **Settings → Pages** and set
+**Build and deployment → Source** to **GitHub Actions**. The first deployment
+will then publish the site; check the **Actions** tab for its status.
+
+Course navigation and the simulated terminal work in this static preview.
+Account creation, sign-in, email, and password recovery need the Express API,
+which GitHub Pages does not run. Those controls are explicitly marked as
+unavailable unless a public API URL is configured with `VITE_API_URL` at build
+time. The Pages build also publishes a `404.html` fallback so course links
+continue to load when opened or refreshed directly.

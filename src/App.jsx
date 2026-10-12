@@ -11,7 +11,13 @@ import {
   SiPython,
 } from 'react-icons/si';
 
-const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const apiBaseUrl =
+  configuredApiUrl || (import.meta.env.DEV ? 'http://127.0.0.1:5000' : '');
+const routerBasename =
+  import.meta.env.BASE_URL === '/'
+    ? undefined
+    : import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const shellCommands = [
   { command: 'ls -la', note: 'List all files with details' },
@@ -561,6 +567,10 @@ function AccountDialog({ mode, onClose, onAuthenticated }) {
 
   async function submitAccountForm(event) {
     event.preventDefault();
+    if (!apiBaseUrl) {
+      setErrorMessage('Accounts are unavailable in this static preview.');
+      return;
+    }
     setIsSubmitting(true);
     setErrorMessage('');
     setSuccessMessage('');
@@ -732,7 +742,9 @@ function AccountDialog({ mode, onClose, onAuthenticated }) {
 function SiteLayout() {
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [accountUser, setAccountUser] = useState(null);
-  const [accountStatus, setAccountStatus] = useState('checking');
+  const [accountStatus, setAccountStatus] = useState(
+    apiBaseUrl ? 'checking' : 'unavailable',
+  );
   const [accountError, setAccountError] = useState('');
   const [authMode, setAuthMode] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -741,6 +753,8 @@ function SiteLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!apiBaseUrl) return undefined;
+
     const controller = new AbortController();
 
     async function loadAccount() {
@@ -805,6 +819,11 @@ function SiteLayout() {
   }
 
   async function logOut() {
+    if (!apiBaseUrl) {
+      setAccountError('Accounts are unavailable in this static preview.');
+      return;
+    }
+
     setIsLoggingOut(true);
     setAccountError('');
     try {
@@ -866,6 +885,10 @@ function SiteLayout() {
               </>
             ) : accountStatus === 'checking' ? (
               <p className="account-menu-message">Checking account…</p>
+            ) : accountStatus === 'unavailable' ? (
+              <p className="account-menu-message">
+                Accounts are unavailable in this static preview.
+              </p>
             ) : (
               <>
                 <button type="button" onClick={() => openAuthDialog('login')}>
@@ -916,7 +939,7 @@ function SiteLayout() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename}>
       <SiteLayout />
     </BrowserRouter>
   );
