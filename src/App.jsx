@@ -861,7 +861,6 @@ function SiteLayout() {
           <span>GitGoing</span>
         </Link>
         <nav className="site-nav" aria-label="Main navigation">
-          <Link to="/#courses">Courses</Link>
           <button className="terminal-nav-button" type="button" onClick={toggleTerminal}>
             {terminalOpen && location.pathname === '/' ? 'Vim editor' : 'Terminal'}
           </button>
