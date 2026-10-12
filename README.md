@@ -50,6 +50,23 @@ password and confirmation there, or use `POST /api/auth/reset-password` with
 `token`, `password`, and `confirmPassword`. Password reset invalidates existing
 sessions; users sign in again with the new password.
 
+## Course assistant
+
+The **Ask GitBuddy** button retrieves relevant lesson pages from the JavaScript,
+Python, Java, C++, HTML/CSS, and Linux courses and sends those excerpts with
+the question to Gemini for a grounded answer. This is retrieval-based question
+answering, not model training. Create a Gemini API key in Google AI Studio and
+set `GEMINI_API_KEY` in `server/.env`; `GEMINI_MODEL` can select a model
+available to your API project. The server keeps the key private, limits
+requests to eight per minute per client, and does not store Gemini interactions.
+
+Questions and selected course excerpts are sent to Google. Google's Gemini API
+free tier may use submitted content to improve its products, so the assistant
+displays this notice and users should not submit personal or sensitive
+information. The static GitHub Pages deployment does not run the Express API;
+using the assistant there requires deploying the API and setting `VITE_API_URL`
+to its public address at frontend build time.
+
 ## Terminal navigation
 
 Choose **Terminal** in the site navigation to replace the Vim preview with the

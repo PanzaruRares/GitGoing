@@ -1325,6 +1325,7 @@ function SiteLayout() {
         <Route path="/courses/:courseSlug" element={<CoursePage />} />
         <Route path="*" element={<CoursePage />} />
       </Routes>
+      <ChatAssistant apiBaseUrl={apiBaseUrl} />
       <footer className="site-footer">
         <Link className="brand" to="/">
           <span className="brand-mark" aria-hidden="true">&gt;_</span>
