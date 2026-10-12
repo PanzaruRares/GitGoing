@@ -3,6 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FaJava, FaUser } from 'react-icons/fa';
 import linuxLessons from './linuxLessons.jsx';
+import htmlCssLessons from './htmlCssLessons.jsx';
+import javascriptLessons from './javascriptLessons.jsx';
+import javaLessons from './javaLessons.jsx';
+import cppLessons from './cppLessons.jsx';
+import programmingLessons from './programmingLessons.jsx';
+import ChatAssistant from './ChatAssistant.jsx';
 import {
   SiCplusplus,
   SiCss,
@@ -50,8 +56,12 @@ const courses = [
     icons: [{ Icon: SiLinux, tone: 'linux' }],
     chapters: [
       {
-        title: 'The terminal and shell',
-        lectures: ['Terminal vs. shell', 'Run your first commands', 'Get help with man and --help'],
+        title: 'Linux architecture and navigation',
+        lectures: [
+          'Linux architecture, filesystem hierarchy and navigation',
+          'Permissions, ownership, pipes and text processing',
+          'Process management, system monitoring and essential tools',
+        ],
       },
       {
         title: 'Navigating the filesystem',
@@ -80,6 +90,48 @@ const courses = [
       { Icon: SiHtml5, tone: 'html' },
       { Icon: SiCss, tone: 'css' },
     ],
+    chapters: [
+      {
+        title: 'HTML Fundamentals & Document Structure',
+        lectures: [
+          'Introduction to the Web and HTML',
+          'HTML Boilerplate and Document Anatomy',
+          'Semantic HTML5 and Accessibility',
+        ],
+      },
+      {
+        title: 'Essential HTML Elements & Forms',
+        lectures: [
+          'Text Content, Lists and Formatting',
+          'Hyperlinks and Media Elements',
+          'Forms and User Input Handling',
+        ],
+      },
+      {
+        title: 'CSS Fundamentals & Selectors',
+        lectures: [
+          'Introduction to CSS and Inclusion Methods',
+          'CSS Rules and Declaration Syntax',
+          'Selectors and Specificity Hierarchy',
+        ],
+      },
+      {
+        title: 'The Box Model & Positioning',
+        lectures: [
+          'The CSS Box Model and Sizing',
+          'Display Types and Document Flow',
+          'Positioning Modes and Offsets',
+        ],
+      },
+      {
+        title: 'Modern Layout & Responsive Design',
+        lectures: [
+          'Flexbox Layout Engine',
+          'CSS Grid Layout Engine',
+          'Responsive Design, Media Queries and CSS Variables',
+        ],
+      },
+    ],
   },
   {
     name: 'JavaScript',
@@ -87,6 +139,109 @@ const courses = [
     level: 'Beginner',
     description: 'Learn the language that brings interactive behavior to websites and powers applications across the web.',
     icons: [{ Icon: SiJavascript, tone: 'javascript' }],
+    allowQuizzes: false,
+    chapters: [
+      {
+        title: 'Introduction',
+        lectures: [
+          'Lecture 1: What Is JavaScript & How the Web Works',
+          'Lecture 2: Data Types & the Console',
+          'Lecture 3: Variables & String Interpolation',
+          'Lecture 4: JavaScript Style Guide & Best Practices',
+        ],
+      },
+      {
+        title: 'Conditionals',
+        lectures: [
+          'Lecture 1: Decision Making and Boolean Logic',
+          'Lecture 2: if, else, and Comparison Operators',
+          'Lecture 3: Logical Operators and Truthy/Falsy Values',
+          'Lecture 4: Ternary and switch',
+          'Lecture 5: Short-Circuiting, Defaults, and Optional Chaining',
+          'Lecture 6: Guard Clauses and Early Returns',
+          'Lecture 7: Lookup Tables, Maps, and Strategy Patterns',
+          'Lecture 8: Common Pitfalls and Best Practices',
+        ],
+      },
+      {
+        title: 'Functions',
+        lectures: [
+          'Lecture 1: Introduction to Functions',
+          'Lecture 2: Function Declarations and Expressions',
+          'Lecture 3: Arrow Functions',
+          'Lecture 4: Parameters, Arguments, and Defaults',
+          'Lecture 5: Return Values and Execution Flow',
+          'Lecture 6: Scope, Hoisting, and Closures',
+          'Lecture 7: Execution Context and `this`',
+          'Lecture 8: Callbacks, Promises, and Async Functions',
+          'Lecture 9: Recursion, Memoization, Composition, and Currying',
+          'Lecture 10: Higher-Order Functions and Best Practices',
+        ],
+      },
+      {
+        title: 'Scope',
+        lectures: [
+          'Lecture 1: Introduction to Scope',
+          'Lecture 2: Global, Function, Block, and Module Scope',
+          'Lecture 3: The Scope Chain and Variable Lookup',
+          'Lecture 4: Lexical Scope',
+          'Lecture 5: Hoisting and the Temporal Dead Zone',
+          'Lecture 6: Closures and Scope Preservation',
+          'Lecture 7: Global Scope and Best Practices',
+        ],
+      },
+      {
+        title: 'Arrays',
+        lectures: [
+          'Lecture 1: Introduction to Arrays',
+          'Lecture 2: Accessing, Updating, and Sparse Arrays',
+          'Lecture 3: Mutating and Non-Mutating Array Methods',
+          'Lecture 4: Searching and Transforming Arrays',
+          'Lecture 5: Sorting, Reversing, and Uniqueness',
+          'Lecture 6: Destructuring and Spread Syntax',
+          'Lecture 7: Typed Arrays, Performance, and Best Practices',
+        ],
+      },
+      {
+        title: 'Loops',
+        lectures: [
+          'Lecture 1: Introduction to Loops',
+          'Lecture 2: Loop Counters and Scope',
+          'Lecture 3: for...in, for...of, and for await...of',
+          'Lecture 4: break, continue, and Labeled Loops',
+          'Lecture 5: Loops and Array Methods',
+          'Lecture 6: Iterables and Generators',
+          'Lecture 7: Safe and Efficient Looping',
+        ],
+      },
+      {
+        title: 'Iterators',
+        lectures: [
+          'Lecture 1: Understanding the Iteration Protocols',
+          'Lecture 2: The Iterator Protocol',
+          'Lecture 3: The Iterable Protocol and Built-in Iterables',
+          'Lecture 4: Custom Iterables and Symbols',
+          'Lecture 5: Lazy and Infinite Iterators',
+          'Lecture 6: Asynchronous Iterators',
+          'Lecture 7: Iterator Best Practices and Generators',
+        ],
+      },
+      {
+        title: 'Objects',
+        lectures: [
+          'Lecture 1: Introduction to Objects',
+          'Lecture 2: Creating Objects',
+          'Lecture 3: Accessing and Updating Properties',
+          'Lecture 4: Object Mutability and Protection',
+          'Lecture 5: Property Descriptors, Getters, and Setters',
+          'Lecture 6: Traversing and Enumerating Objects',
+          'Lecture 7: Cloning and Merging Objects',
+          'Lecture 8: Prototypes and Inheritance',
+          'Lecture 9: Destructuring and Symbols',
+          'Lecture 10: Object Best Practices and Maps',
+        ],
+      },
+    ],
   },
   {
     name: 'Python',
@@ -94,13 +249,204 @@ const courses = [
     level: 'Beginner',
     description: 'Get started with clear, readable code and use Python to solve problems and create useful programs.',
     icons: [{ Icon: SiPython, tone: 'python' }],
+    allowQuizzes: false,
+    chapters: [
+      {
+        title: 'Introduction',
+        lectures: [
+          'Lecture 1: What Is Python?',
+          'Lecture 2: Running Python and Using print()',
+          'Lecture 3: Variables, Values, and Basic Types',
+          'Lecture 4: Strings, Numbers, and Python Style',
+        ],
+      },
+      {
+        title: 'Conditionals',
+        lectures: [
+          'Lecture 1: Decisions and Boolean Values',
+          'Lecture 2: if, elif, and else',
+          'Lecture 3: Comparison and Membership Operators',
+          'Lecture 4: Combining Conditions with and, or, and not',
+          'Lecture 5: Truthiness and Conditional Expressions',
+          'Lecture 6: match and Guard Clauses',
+          'Lecture 7: Nested Decisions and Clear Branches',
+          'Lecture 8: Conditional Best Practices',
+        ],
+      },
+      {
+        title: 'Functions',
+        lectures: [
+          'Lecture 1: Introduction to Functions',
+          'Lecture 2: Defining and Calling Functions',
+          'Lecture 3: Parameters and Arguments',
+          'Lecture 4: Return Values and None',
+          'Lecture 5: Default and Keyword Arguments',
+          'Lecture 6: Scope and Closures in Functions',
+          'Lecture 7: Functions as Values and Lambdas',
+          'Lecture 8: Callbacks and Higher-Order Functions',
+          'Lecture 9: Recursion and Base Cases',
+          'Lecture 10: Function Design and Documentation',
+        ],
+      },
+      {
+        title: 'Scope',
+        lectures: [
+          'Lecture 1: Introduction to Scope',
+          'Lecture 2: Local, Global, and Enclosing Names',
+          'Lecture 3: LEGB Name Resolution',
+          'Lecture 4: Blocks, Modules, and Lifetime',
+          'Lecture 5: Closures and nonlocal',
+          'Lecture 6: Imports and Namespaces',
+          'Lecture 7: Scope Best Practices',
+        ],
+      },
+      {
+        title: 'Arrays',
+        lectures: [
+          'Lecture 1: Python Lists and Sequences',
+          'Lecture 2: Indexing, Slicing, and Updating',
+          'Lecture 3: Adding, Removing, and Copying Lists',
+          'Lecture 4: Searching, Sorting, and Common Methods',
+          'Lecture 5: Tuples, Dictionaries, and Sets',
+          'Lecture 6: Comprehensions and Unpacking',
+          'Lecture 7: Collections and Performance Practices',
+        ],
+      },
+      {
+        title: 'Loops',
+        lectures: [
+          'Lecture 1: Introduction to Loops',
+          'Lecture 2: range(), enumerate(), and Loop Variables',
+          'Lecture 3: while Loops and Termination',
+          'Lecture 4: break and continue',
+          'Lecture 5: Nested Loops and Collection Processing',
+          'Lecture 6: Loops and Comprehensions',
+          'Lecture 7: Loop Best Practices',
+        ],
+      },
+      {
+        title: 'Iterators',
+        lectures: [
+          'Lecture 1: Iterables and Iterators',
+          'Lecture 2: The Iterator Protocol',
+          'Lecture 3: Built-in Iterables',
+          'Lecture 4: Custom Iterators',
+          'Lecture 5: Generator Functions and yield',
+          'Lecture 6: Lazy Iteration and Generator Expressions',
+          'Lecture 7: Asynchronous Iteration and Best Practices',
+        ],
+      },
+      {
+        title: 'Objects',
+        lectures: [
+          'Lecture 1: Introduction to Objects',
+          'Lecture 2: Creating Classes and Instances',
+          'Lecture 3: Attributes and Methods',
+          'Lecture 4: Instance and Class Attributes',
+          'Lecture 5: Properties and Encapsulation',
+          'Lecture 6: Special Methods and Object Representation',
+          'Lecture 7: Inheritance and Method Overriding',
+          'Lecture 8: Composition and Object Collaboration',
+          'Lecture 9: Dataclasses and Simple Records',
+          'Lecture 10: Object Design and Best Practices',
+        ],
+      },
+    ],
   },
   {
     name: 'Java',
     slug: 'java',
     level: 'Advanced',
-    description: 'Study object-oriented programming and build a strong foundation for reliable, large-scale applications.',
+    description: 'Learn Java from its core types and collections through object-oriented design, error handling, and file input/output.',
     icons: [{ Icon: FaJava, tone: 'java' }],
+    chapters: [
+      {
+        title: 'Introduction',
+        lectures: [
+          'Lecture 1: What Java Is and Where It Runs',
+          'Lecture 2: Running a Java Program and Using the Console',
+          'Lecture 3: Variables, Values, and Primitive Types',
+          'Lecture 4: Reference Types, Strings, and null',
+          'Lecture 5: Expressions, Operators, and Basic Style',
+        ],
+      },
+      {
+        title: 'Conditionals',
+        lectures: [
+          'Lecture 1: Boolean Logic and Comparisons',
+          'Lecture 2: if, else if, and else',
+          'Lecture 3: switch Statements and Expressions',
+          'Lecture 4: Input Validation and Conditional Best Practices',
+        ],
+      },
+      {
+        title: 'Methods and Scope',
+        lectures: [
+          'Lecture 1: Declaring and Calling Methods',
+          'Lecture 2: Overloading, Parameters, and Return Values',
+          'Lecture 3: Static Members, Instance Members, and this',
+          'Lecture 4: Scope, Visibility, and Packages',
+          'Lecture 5: Method Contracts, Documentation, and Testing',
+        ],
+      },
+      {
+        title: 'Arrays and Strings',
+        lectures: [
+          'Lecture 1: Arrays and Fixed-Size Sequences',
+          'Lecture 2: Indexing, Updating, and Multidimensional Arrays',
+          'Lecture 3: String Operations and Immutability',
+          'Lecture 4: Comparing, Formatting, and Parsing Text',
+        ],
+      },
+      {
+        title: 'Loops and Iteration',
+        lectures: [
+          'Lecture 1: for, while, and do-while Loops',
+          'Lecture 2: for-each, break, and continue',
+          'Lecture 3: Iterators and the Iterable Protocol',
+          'Lecture 4: Loop Design, Nested Traversal, and Common Errors',
+        ],
+      },
+      {
+        title: 'Collections and Generics',
+        lectures: [
+          'Lecture 1: The Java Collections Framework',
+          'Lecture 2: Lists, ArrayList, and LinkedList',
+          'Lecture 3: Sets, Maps, and Choosing Collection Types',
+          'Lecture 4: Iterating, Sorting, and Transforming Collections',
+          'Lecture 5: Generics, Wildcards, and Type Safety',
+        ],
+      },
+      {
+        title: 'Objects',
+        lectures: [
+          'Lecture 1: Classes, Objects, and Instance State',
+          'Lecture 2: Encapsulation, Accessors, and Invariants',
+          'Lecture 3: Object Equality, toString, and Records',
+          'Lecture 4: Inheritance, Interfaces, and Polymorphism',
+          'Lecture 5: Composition and Object Collaboration',
+          'Lecture 6: Object Design and Best Practices',
+        ],
+      },
+      {
+        title: 'Exceptions',
+        lectures: [
+          'Lecture 1: Exceptions and Failure Paths',
+          'Lecture 2: Checked Exceptions and Validation',
+          'Lecture 3: Designing Reliable Error Handling',
+        ],
+      },
+      {
+        title: 'Input and Output',
+        lectures: [
+          'Lecture 1: Reading Console Input',
+          'Lecture 2: Files, Paths, and Text I/O',
+          'Lecture 3: Streams, Readers, Writers, and Resources',
+          'Lecture 4: Formatting Data and Choosing an I/O Boundary',
+          'Lecture 5: A Small Console-to-File Program',
+        ],
+      },
+    ],
   },
   {
     name: 'C++',
@@ -108,6 +454,98 @@ const courses = [
     level: 'Advanced',
     description: 'Understand powerful programming fundamentals, from types and memory to efficient native applications.',
     icons: [{ Icon: SiCplusplus, tone: 'cplusplus' }],
+    chapters: [
+      {
+        title: 'Introduction',
+        lectures: [
+          'Lecture 1: What C++ Is and Where It Runs',
+          'Lecture 2: Variables, Built-in Types, and Initialization',
+          'Lecture 3: Expressions, Conversions, and Operators',
+          'Lecture 4: Strings, Characters, and Basic Formatting',
+          'Lecture 5: C++ Style, Headers, and Build Basics',
+        ],
+      },
+      {
+        title: 'Conditionals',
+        lectures: [
+          'Lecture 1: Boolean Logic and Comparisons',
+          'Lecture 2: if, else if, and else',
+          'Lecture 3: switch, Enums, and Patterned Decisions',
+          'Lecture 4: Validation and Conditional Best Practices',
+        ],
+      },
+      {
+        title: 'Functions and Scope',
+        lectures: [
+          'Lecture 1: Declaring, Defining, and Calling Functions',
+          'Lecture 2: Parameters, References, and const Correctness',
+          'Lecture 3: Overloads, Default Arguments, and Function Contracts',
+          'Lecture 4: Scope, Lifetime, and Storage Duration',
+          'Lecture 5: Headers, Namespaces, and Program Organization',
+        ],
+      },
+      {
+        title: 'Arrays and Strings',
+        lectures: [
+          'Lecture 1: Built-in Arrays and std::array',
+          'Lecture 2: std::vector and Dynamic Sequences',
+          'Lecture 3: C++ Strings and Text Processing',
+          'Lecture 4: Pointers, References, and Views',
+        ],
+      },
+      {
+        title: 'Loops and Iteration',
+        lectures: [
+          'Lecture 1: for, while, and do-while Loops',
+          'Lecture 2: Range-Based for, break, and continue',
+          'Lecture 3: Iterators and Iterator Categories',
+          'Lecture 4: Loop Design, Complexity, and Common Bugs',
+        ],
+      },
+      {
+        title: 'Data Structures and Algorithms',
+        lectures: [
+          'Lecture 1: Choosing a Data Structure and Measuring Complexity',
+          'Lecture 2: Linked Lists and Node Ownership',
+          'Lecture 3: Stacks, Queues, and Deques',
+          'Lecture 4: Heaps and Priority Queues',
+          'Lecture 5: Trees, Binary Search Trees, and Traversal',
+          'Lecture 6: Hash Tables and Associative Containers',
+          'Lecture 7: Standard Algorithms, Complexity, and Data-Structure Choices',
+        ],
+      },
+      {
+        title: 'Objects and Memory Management',
+        lectures: [
+          'Lecture 1: Classes, Objects, and Invariants',
+          'Lecture 2: Constructors, Destructors, and RAII',
+          'Lecture 3: Stack, Heap, Pointers, and Object Lifetime',
+          'Lecture 4: Smart Pointers and Ownership Models',
+          'Lecture 5: Copying, Moving, and Value Semantics',
+          'Lecture 6: Manual Dynamic Allocation and Memory Safety',
+          'Lecture 7: Polymorphism, Virtual Functions, and Object Slicing',
+          'Lecture 8: Templates and Generic Programming',
+        ],
+      },
+      {
+        title: 'Exceptions and Error Handling',
+        lectures: [
+          'Lecture 1: Exceptions and Failure Paths',
+          'Lecture 2: Result Types, Validation, and Error Contracts',
+          'Lecture 3: Error Handling, noexcept, and Testing Failures',
+        ],
+      },
+      {
+        title: 'Input and Output',
+        lectures: [
+          'Lecture 1: Console Input and Output Streams',
+          'Lecture 2: Files, Paths, and File Streams',
+          'Lecture 3: Binary I/O, Serialization, and Encoding',
+          'Lecture 4: Streams, Buffers, and Resource Ownership',
+          'Lecture 5: Building a Console-to-File Application',
+        ],
+      },
+    ],
   },
 ];
 
@@ -458,7 +896,11 @@ function CoursePage() {
         <div className="chapter-section-heading">
           <p className="course-detail-kicker">COURSE CONTENT</p>
           <h2 id="chapter-section-title">Chapters</h2>
-          <p>Select a chapter to view its lectures, quizzes, and test.</p>
+          <p>
+            {course.allowQuizzes === false
+              ? 'Select a part to open its articles and lessons.'
+              : 'Select a chapter to view its lectures, quizzes, and test.'}
+          </p>
         </div>
         <div className="chapter-list">
           {chapters.map((chapter, index) => {
@@ -480,15 +922,22 @@ function CoursePage() {
                 </button>
                 {isSelected && (
                   <div className="chapter-dropdown" id={panelId}>
-                    <ol className="chapter-sequence">
+                    {chapter.lectures.length > 0 ? (
+                      <ol className="chapter-sequence">
                       {chapter.lectures.map((lecture, lectureIndex) => (
                         <li
-                          className={`chapter-group${lectureIndex === 2 ? ' final-chapter-group' : ''}`}
+                          className={`chapter-group${course.allowQuizzes !== false && lectureIndex === chapter.lectures.length - 1 ? ' final-chapter-group' : ''}`}
                           key={lecture}
                         >
                           <h3>
                             {String(lectureIndex + 1).padStart(2, '0')}
-                            <span>{lectureIndex === 2 ? 'Finish chapter' : 'Learn & check'}</span>
+                            <span>
+                              {course.allowQuizzes === false
+                                ? 'Read & learn'
+                                : lectureIndex === chapter.lectures.length - 1
+                                  ? 'Finish chapter'
+                                  : 'Learn & check'}
+                            </span>
                           </h3>
                           <div className="chapter-group-resources">
                             <Link
@@ -499,7 +948,7 @@ function CoursePage() {
                             >
                               {lecture}
                             </Link>
-                            {lectureIndex < 2 ? (
+                            {course.allowQuizzes !== false && lectureIndex < 2 ? (
                               <Link
                                 className="chapter-resource quiz-resource"
                                 to={course.chapters
@@ -508,13 +957,18 @@ function CoursePage() {
                               >
                                 Quiz {lectureIndex + 1}
                               </Link>
-                            ) : (
+                            ) : course.allowQuizzes !== false && lectureIndex === chapter.lectures.length - 1 ? (
                               <div className="chapter-resource chapter-test">Chapter Test</div>
-                            )}
+                            ) : course.allowQuizzes !== false ? (
+                              <div className="chapter-resource">Guided practice</div>
+                            ) : null}
                           </div>
                         </li>
                       ))}
-                    </ol>
+                      </ol>
+                    ) : (
+                      <p className="chapter-empty-state">Lessons for this part are being prepared.</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -866,8 +1320,9 @@ function CourseActivityPage() {
   const number = Number(itemNumber);
   const selectedChapterNumber = chapterNumber ? Number(chapterNumber) : 1;
   const chapter = course?.chapters?.[selectedChapterNumber - 1];
-  const validType = itemType === 'lecture' || itemType === 'quiz';
-  const maxNumber = itemType === 'lecture' ? 3 : 2;
+  const validType = itemType === 'lecture' ||
+    (itemType === 'quiz' && course?.allowQuizzes !== false);
+  const maxNumber = itemType === 'lecture' ? chapter?.lectures.length ?? 3 : 2;
 
   if (
     !course ||
@@ -888,15 +1343,26 @@ function CourseActivityPage() {
     );
   }
 
-  const linuxChapter = course.slug === 'linux'
-    ? linuxLessons[selectedChapterNumber]
+  const courseLessons = course.slug === 'linux'
+    ? linuxLessons
+    : course.slug === 'html-css'
+    ? htmlCssLessons
+    : course.slug === 'javascript'
+    ? javascriptLessons
+    : course.slug === 'java'
+    ? javaLessons
+    : course.slug === 'cpp'
+    ? cppLessons
+    : programmingLessons[course.slug];
+  const currentChapter = courseLessons
+    ? courseLessons[selectedChapterNumber]
     : null;
-  const linuxLesson = itemType === 'lecture'
-    ? linuxChapter?.lectures?.[number] ||
-      (number === 1 && linuxChapter?.pages ? linuxChapter : null)
+  const currentLesson = itemType === 'lecture'
+    ? currentChapter?.lectures?.[number] ||
+      (number === 1 && currentChapter?.pages ? currentChapter : null)
     : null;
   const title = itemType === 'lecture'
-    ? linuxLesson?.title || chapter?.lectures[number - 1] || `Lecture ${number}`
+    ? currentLesson?.title || chapter?.lectures[number - 1] || `Lecture ${number}`
     : `Quiz ${number}`;
 
   return (
@@ -914,10 +1380,10 @@ function CourseActivityPage() {
             {course.name} / {chapter?.title || `CHAPTER ${selectedChapterNumber.toString().padStart(2, '0')}`}
           </p>
           <h1>{title}<span className="course-detail-cursor">_</span></h1>
-          {linuxLesson ? (
+          {currentLesson ? (
             <LinuxLessonPager
-              key={`${selectedChapterNumber}-${number}`}
-              lessonPages={linuxLesson.pages}
+              key={`${course.slug}-${selectedChapterNumber}-${number}`}
+              lessonPages={currentLesson.pages}
               onFinish={() => navigate(`/courses/${course.slug}`)}
             />
           ) : (

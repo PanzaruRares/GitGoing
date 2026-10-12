@@ -887,6 +887,8 @@ a.chapter-resource:focus-visible {
 .activity-detail-content h1 {
   margin-bottom: 1rem;
   color: var(--course-text);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.15;
 }
 
 .lesson-content,
@@ -953,12 +955,24 @@ a.chapter-resource:focus-visible {
 .lesson-page pre {
   margin: 0.8rem 0;
   padding: 0.9rem 1rem;
-  overflow-x: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   border: 1px solid color-mix(in srgb, var(--course-accent) 40%, transparent);
   background: var(--course-background);
 }
 
 .lesson-page pre code {
+  color: var(--course-text);
+}
+
+.course-theme-java .lesson-page pre code {
+  color: #fff1e7;
+}
+
+.course-theme-java .lesson-lead,
+.course-theme-java .lesson-takeaway {
+  background: color-mix(in srgb, var(--course-accent) 8%, var(--course-panel));
   color: var(--course-text);
 }
 

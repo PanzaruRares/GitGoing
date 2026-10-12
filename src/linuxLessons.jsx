@@ -474,7 +474,7 @@ function countWords(block) {
   return (text.match(/\b[\w'-]+\b/g) || []).length;
 }
 
-function splitLessonPages(blocks, pageCount = 5) {
+function splitLessonPages(blocks, pageCount = 3) {
   const wordTotals = [0];
   blocks.forEach((block) => {
     wordTotals.push(wordTotals[wordTotals.length - 1] + countWords(block));
@@ -552,6 +552,26 @@ function renderLessonBlock(block, index, firstParagraph) {
 
 function createExpandedChapterOneLectures() {
   const headings = [...chapterOneText.matchAll(/^### Lecture \d+: (.+)$/gm)];
+  const importantNotes = [
+    [
+      'Linux is the kernel; distributions package it with utilities and applications.',
+      'The filesystem is one tree rooted at /; absolute paths start there.',
+      'Use pwd, ls, and cd to locate, inspect, and navigate directories.',
+      'Check the exact path before recursive deletion; rm -r can permanently remove data.',
+    ],
+    [
+      'Permissions are grouped by owner, group, and others; r, w, and x have values 4, 2, and 1.',
+      'A mode such as 755 means rwx for the owner and r-x for group and others.',
+      'Pipes pass stdout to the next command as stdin; redirection sends streams elsewhere.',
+      'Verify paths and targets before changing ownership with sudo.',
+    ],
+    [
+      'A PID identifies a process; shell job numbers belong only to that shell session.',
+      'kill normally requests a graceful stop; SIGKILL should be a last resort.',
+      'Use df, du, free, and process tools to inspect different system resources.',
+      'Inspect commands and targets before using sudo or destructive tools.',
+    ],
+  ];
 
   return Object.fromEntries(headings.map((heading, index) => {
     const start = heading.index + heading[0].length;
@@ -580,13 +600,14 @@ function createExpandedChapterOneLectures() {
               blockIndex,
               blockIndex === firstParagraph,
             ))}
-            {pageIndex === 4 && (
+            {pageIndex === 2 && (
               <aside className="lesson-callout">
-                <strong>Simulator note</strong>
-                <p>
-                  The commands in this lecture’s practice section require a
-                  real Linux environment; the GitGoing terminal is a simulator.
-                </p>
+                <strong>Important to remember</strong>
+                <ul>
+                  {importantNotes[index].map((note) => (
+                    <li key={note}>{renderInlineMarkdown(note)}</li>
+                  ))}
+                </ul>
               </aside>
             )}
           </>
