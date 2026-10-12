@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FaJava, FaUser } from 'react-icons/fa';
+import linuxLessons from './linuxLessons.jsx';
 import {
   SiCplusplus,
   SiCss,
@@ -47,6 +48,28 @@ const courses = [
     level: 'Beginner',
     description: 'Explore the Linux command line, navigate files, and learn the tools used to work inside an operating system.',
     icons: [{ Icon: SiLinux, tone: 'linux' }],
+    chapters: [
+      {
+        title: 'The terminal and shell',
+        lectures: ['Terminal vs. shell', 'Run your first commands', 'Get help with man and --help'],
+      },
+      {
+        title: 'Navigating the filesystem',
+        lectures: ['Understand paths', 'List files with ls', 'Move around with cd'],
+      },
+      {
+        title: 'Working with files',
+        lectures: ['Create and manage files', 'Read file contents', 'Search with grep'],
+      },
+      {
+        title: 'Users, permissions, and processes',
+        lectures: ['Users and groups', 'Read, write, and execute permissions', 'Inspect and manage processes'],
+      },
+      {
+        title: 'Putting commands together',
+        lectures: ['Redirect command output', 'Connect commands with pipes', 'Write a script to organize files'],
+      },
+    ],
   },
   {
     name: 'HTML / CSS',
@@ -403,6 +426,10 @@ function CoursePage() {
   }
 
   const CourseIcon = course.icons[0].Icon;
+  const chapters = course.chapters || Array.from({ length: 5 }, (_, index) => ({
+    title: `Chapter ${index + 1}`,
+    lectures: ['Lecture 1', 'Lecture 2', 'Lecture 3'],
+  }));
   const pageClass = `course-page course-theme-${course.slug}`;
 
   return (
@@ -434,7 +461,7 @@ function CoursePage() {
           <p>Select a chapter to view its lectures, quizzes, and test.</p>
         </div>
         <div className="chapter-list">
-          {Array.from({ length: 5 }, (_, index) => {
+          {chapters.map((chapter, index) => {
             const isSelected = selectedChapter === index;
             const panelId = `${course.slug}-chapter-${index + 1}-content`;
 
@@ -448,43 +475,45 @@ function CoursePage() {
                   onClick={() => setSelectedChapter(isSelected ? null : index)}
                 >
                   <span className="chapter-number">{String(index + 1).padStart(2, '0')}</span>
-                  <span>Chapter {index + 1}</span>
+                  <span>{chapter.title}</span>
                   <span className="chapter-chevron" aria-hidden="true">{isSelected ? '−' : '+'}</span>
                 </button>
                 {isSelected && (
                   <div className="chapter-dropdown" id={panelId}>
                     <ol className="chapter-sequence">
-                      <li className="chapter-group">
-                        <h3>01 <span>Learn & check</span></h3>
-                        <div className="chapter-group-resources">
-                          <Link className="chapter-resource lecture-resource" to={`/courses/${course.slug}/lecture/1`}>
-                            Lecture 1
-                          </Link>
-                          <Link className="chapter-resource quiz-resource" to={`/courses/${course.slug}/quiz/1`}>
-                            Quiz 1
-                          </Link>
-                        </div>
-                      </li>
-                      <li className="chapter-group">
-                        <h3>02 <span>Learn & check</span></h3>
-                        <div className="chapter-group-resources">
-                          <Link className="chapter-resource lecture-resource" to={`/courses/${course.slug}/lecture/2`}>
-                            Lecture 2
-                          </Link>
-                          <Link className="chapter-resource quiz-resource" to={`/courses/${course.slug}/quiz/2`}>
-                            Quiz 2
-                          </Link>
-                        </div>
-                      </li>
-                      <li className="chapter-group final-chapter-group">
-                        <h3>03 <span>Finish chapter</span></h3>
-                        <div className="chapter-group-resources">
-                          <Link className="chapter-resource lecture-resource" to={`/courses/${course.slug}/lecture/3`}>
-                            Lecture 3
-                          </Link>
-                          <div className="chapter-resource chapter-test">Chapter Test</div>
-                        </div>
-                      </li>
+                      {chapter.lectures.map((lecture, lectureIndex) => (
+                        <li
+                          className={`chapter-group${lectureIndex === 2 ? ' final-chapter-group' : ''}`}
+                          key={lecture}
+                        >
+                          <h3>
+                            {String(lectureIndex + 1).padStart(2, '0')}
+                            <span>{lectureIndex === 2 ? 'Finish chapter' : 'Learn & check'}</span>
+                          </h3>
+                          <div className="chapter-group-resources">
+                            <Link
+                              className="chapter-resource lecture-resource"
+                              to={course.chapters
+                                ? `/courses/${course.slug}/chapter/${index + 1}/lecture/${lectureIndex + 1}`
+                                : `/courses/${course.slug}/lecture/${lectureIndex + 1}`}
+                            >
+                              {lecture}
+                            </Link>
+                            {lectureIndex < 2 ? (
+                              <Link
+                                className="chapter-resource quiz-resource"
+                                to={course.chapters
+                                  ? `/courses/${course.slug}/chapter/${index + 1}/quiz/${lectureIndex + 1}`
+                                  : `/courses/${course.slug}/quiz/${lectureIndex + 1}`}
+                              >
+                                Quiz {lectureIndex + 1}
+                              </Link>
+                            ) : (
+                              <div className="chapter-resource chapter-test">Chapter Test</div>
+                            )}
+                          </div>
+                        </li>
+                      ))}
                     </ol>
                   </div>
                 )}
@@ -497,14 +526,359 @@ function CoursePage() {
   );
 }
 
+function LinuxLessonPager({ onFinish, lessonPages }) {
+  const [currentPage, setCurrentPage] = useState(0);
+  const pages = [
+    {
+      title: 'Terminal vs. shell: separate the layers',
+      content: (
+        <>
+          <p className="lesson-lead">
+            They often share a window, but they are not the same program. That
+            distinction pays off when you debug input, customize your workflow,
+            or figure out which layer produced an unexpected result.
+          </p>
+          <section className="lesson-topic">
+            <h3>Terminal: the interface layer</h3>
+            <p>
+              A terminal emulator provides the text UI: it renders output,
+              handles keyboard input, and connects the session to a
+              <code> pseudo-terminal (PTY)</code>. It transports characters; it
+              does not decide what <code>ls -la</code> means.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Shell: the command environment</h3>
+            <p>
+              A <strong>shell</strong> is a process attached to that terminal.
+              It parses command lines, expands variables and patterns, locates
+              commands, and starts programs. Bash, Zsh, and Fish are different
+              shells, each with its own syntax and features.
+            </p>
+            <p>
+              For example, the shell interprets <code>$HOME</code> in a command
+              such as <code>cd "$HOME/projects"</code>. The terminal simply
+              displays the command and its output.
+            </p>
+          </section>
+          <aside className="lesson-callout">
+            <strong>Quick model</strong>
+            <p>
+              Terminal emulator ⇄ PTY ⇄ shell ⇄ command/processes. Different
+              layers, one interactive session.
+            </p>
+          </aside>
+          <section className="lesson-topic">
+            <h3>Why the distinction matters</h3>
+            <p>
+              A broken font or window setting belongs to the terminal emulator.
+              A surprising expansion, alias, or “command not found” usually
+              points toward the shell environment. Knowing which layer owns a
+              behavior narrows the search fast.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Same terminal, different shell</h3>
+            <p>
+              Launch Bash or Zsh in the same terminal emulator and the window
+              stays the same while command interpretation and interactive
+              features change. Shell scripts can also declare which interpreter
+              should run them, so shell choice can affect portability.
+            </p>
+          </section>
+          <p className="lesson-takeaway">
+            When a command-line behavior surprises you, ask: is it the terminal
+            UI, the shell, or the program the shell launched?
+          </p>
+        </>
+      ),
+    },
+    {
+      title: 'What happens after you press Enter?',
+      content: (
+        <>
+          <p className="lesson-lead">
+            Follow <code>printf '%s\n' "$HOME"</code> from shell syntax to
+            process output.
+          </p>
+          <section className="lesson-topic">
+            <h3>1. Parse and expand</h3>
+            <p>
+              The shell recognizes the command name, quotes, arguments, and
+              expansions. Here <code>$HOME</code> is replaced with the current
+              user’s home path; the quotes keep that result together as one
+              argument.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>2. Resolve and run</h3>
+            <p>
+              For an external command, the shell searches locations listed in
+              <code> PATH</code>, creates a process, and arranges its working
+              directory and environment. <code>cd</code> is a built-in: it must
+              change the current shell’s directory.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>3. Stream input and output</h3>
+            <p>
+              Every process starts with standard input (<code>stdin</code>),
+              standard output (<code>stdout</code>), and standard error
+              (<code>stderr</code>). By default, output and errors appear in the
+              terminal. Redirection and pipes can connect those streams to files
+              or other commands.
+            </p>
+            <pre><code>$ printf '%s\n' "$HOME"{"\n"}/home/learner</code></pre>
+          </section>
+          <section className="lesson-topic">
+            <h3>4. Return a status</h3>
+            <p>
+              A completed command leaves an exit status. By convention,
+              <code> 0</code> means success and a non-zero value signals some
+              kind of failure. Shell scripts use that status to make decisions;
+              it is separate from the human-readable text printed to the screen.
+            </p>
+          </section>
+          <p className="lesson-takeaway">
+            The shell parses and coordinates; a program does its work; streams
+            carry data; an exit status reports how the command finished.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: 'The prompt is live context',
+      content: (
+        <>
+          <p className="lesson-lead">
+            The prompt is a compact status display, not decoration. Depending on
+            its configuration, it can expose the user, host, working directory,
+            and Git branch.
+          </p>
+          <section className="lesson-topic">
+            <h3>Read the common fields</h3>
+            <p>
+              In <code>sam@lab:~/project$</code>, <code>sam</code> is the user,
+              <code>lab</code> is the host, and <code>~/project</code> is the
+              current directory. The <code>~</code> abbreviation represents the
+              user’s home directory.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Prompt symbols are conventions</h3>
+            <p>
+              A trailing <code>$</code> commonly marks a regular-user prompt;
+              <code> #</code> often indicates a privileged shell. These are
+              conventions, not guarantees.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>The current directory changes command meaning</h3>
+            <p>
+              Relative paths are interpreted from the working directory. Running
+              <code> ls</code> in a project root can show different files from
+              running it in <code>src</code>. Use <code>pwd</code> when that
+              context is missing or ambiguous.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Prompts can be customized</h3>
+            <p>
+              Bash builds its prompt from <code>PS1</code>; other shells use
+              their own configuration. It might show Git status, a container,
+              or a virtual environment; verify with a command when accuracy
+              matters.
+            </p>
+          </section>
+          <p className="lesson-takeaway">
+            A prompt is a customizable dashboard for the shell session. Know
+            your working directory and privilege level before changing files.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: 'Put the model to work',
+      content: (
+        <>
+          <p className="lesson-lead">
+            GitGoing’s terminal is a deliberately small simulator, not a full
+            Linux shell. Use it to inspect the command loop, then distinguish
+            simulation from real system behavior.
+          </p>
+          <section className="lesson-topic">
+            <h3>Inspect the simulator</h3>
+            <p>
+              Open <strong>Terminal</strong> from the navigation. Run
+              <code> help</code> to inspect its supported commands. It models
+              course navigation, not your computer’s filesystem.
+            </p>
+            <pre><code>$ help{"\n"}Available commands: ls, whoami, pwd, cd &lt;course&gt;, cd .., clear, exit</code></pre>
+          </section>
+          <section className="lesson-topic">
+            <h3>Use output to choose the next command</h3>
+            <p>
+              Run <code>pwd</code>, then <code>ls</code>. The simulator reports
+              <code> /home/guest</code> and lists available courses.
+              Try <code>cd Linux</code> to open the Linux course, then use the
+              back link. Here <code>cd</code> navigates course pages; in Linux
+              it changes the working directory.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Compare identity with location</h3>
+            <p>
+              Back in the terminal, run <code>whoami</code> and <code>pwd</code>.
+              It returns <code>guest</code> and <code> /home/guest</code>. On
+              Linux, these report your session user and working directory.
+            </p>
+          </section>
+          <aside className="lesson-callout">
+            <strong>Transfer the concept, not the simulator’s output</strong>
+            <p>
+              Real <code>ls</code> lists directory entries; this simulator lists
+              courses. Same command name, different implementation.
+            </p>
+          </aside>
+          <p className="lesson-takeaway">
+            Use a real Linux environment to explore actual filesystem and process
+            behavior.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: 'Keep the layers straight',
+      content: (
+        <>
+          <p className="lesson-lead">
+            You do not need to memorize a diagram. Keep the boundaries clear and
+            terminal errors become easier to classify, investigate, and fix.
+          </p>
+          <section className="lesson-topic">
+            <h3>The short version</h3>
+            <ul>
+              <li><strong>Terminal:</strong> UI and PTY connection.</li>
+              <li><strong>Shell:</strong> parser, environment, and command launcher.</li>
+              <li><strong>Process:</strong> a running program with streams and an exit status.</li>
+              <li><strong>Prompt:</strong> configurable context for the current shell.</li>
+            </ul>
+            <p>
+              A terminal starts a shell; that shell can start commands. The
+              shell may also handle built-ins directly. Output returns through
+              standard streams to the terminal, and the exit status carries a
+              machine-readable result.
+            </p>
+          </section>
+          <section className="lesson-topic">
+            <h3>Debug by layer</h3>
+            <p>
+              No window or garbled characters? Inspect the terminal emulator.
+              Wrong expansion or command lookup? Inspect shell settings,
+              aliases, and <code>PATH</code>. Unexpected application output?
+              Check the command, its arguments, and its inputs.
+            </p>
+          </section>
+          <details className="lesson-check">
+            <summary>Quick check: where does <code>$HOME</code> get expanded?</summary>
+            <p>
+              By the shell, before the command receives its arguments.
+            </p>
+          </details>
+          <details className="lesson-check">
+            <summary>Quick check: why is <code>cd</code> usually a shell built-in?</summary>
+            <p>
+              It must change the working directory of the current shell. A child
+              process cannot change its parent shell’s directory.
+            </p>
+          </details>
+          <details className="lesson-check">
+            <summary>Quick check: what does a non-zero exit status signal?</summary>
+            <p>
+              Conventionally, that the command did not complete successfully.
+              The exact meaning depends on the command.
+            </p>
+          </details>
+          <p className="lesson-takeaway">
+            Next: put this model to work while navigating paths and inspecting
+            files—the point where shell context starts saving real time.
+          </p>
+        </>
+      ),
+    },
+  ];
+  const activePages = lessonPages || pages;
+  const page = activePages[currentPage];
+  const progress = Math.round(((currentPage + 1) / activePages.length) * 100);
+
+  return (
+    <div className="lesson-pager">
+      <div className="lesson-progress">
+        <div className="lesson-progress-label">
+          <span>PAGE {currentPage + 1} OF {activePages.length}</span>
+          <span>{progress}% COMPLETE</span>
+        </div>
+        <div
+          className="lesson-progress-track"
+          role="progressbar"
+          aria-label="Lecture progress"
+          aria-valuemin={1}
+          aria-valuemax={activePages.length}
+          aria-valuenow={currentPage + 1}
+        >
+          <span style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+      <section className="lesson-page" aria-live="polite">
+        <h2>{page.title}</h2>
+        {page.content}
+      </section>
+      <nav className="lesson-pagination" aria-label="Lecture pages">
+        <button
+          type="button"
+          onClick={() => setCurrentPage((pageIndex) => Math.max(0, pageIndex - 1))}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <span>Page {currentPage + 1} / {activePages.length}</span>
+        {currentPage === activePages.length - 1 ? (
+          <button type="button" onClick={onFinish}>
+            Finish
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setCurrentPage((pageIndex) => Math.min(activePages.length - 1, pageIndex + 1))}
+          >
+            Next
+          </button>
+        )}
+      </nav>
+    </div>
+  );
+}
+
 function CourseActivityPage() {
-  const { courseSlug, itemType, itemNumber } = useParams();
+  const { courseSlug, chapterNumber, itemType, itemNumber } = useParams();
+  const navigate = useNavigate();
   const course = courses.find(({ slug }) => slug === courseSlug);
   const number = Number(itemNumber);
+  const selectedChapterNumber = chapterNumber ? Number(chapterNumber) : 1;
+  const chapter = course?.chapters?.[selectedChapterNumber - 1];
   const validType = itemType === 'lecture' || itemType === 'quiz';
   const maxNumber = itemType === 'lecture' ? 3 : 2;
 
-  if (!course || !validType || !Number.isInteger(number) || number < 1 || number > maxNumber) {
+  if (
+    !course ||
+    !validType ||
+    !Number.isInteger(number) ||
+    number < 1 ||
+    number > maxNumber ||
+    !Number.isInteger(selectedChapterNumber) ||
+    selectedChapterNumber < 1 ||
+    (course.chapters && !chapter)
+  ) {
     return (
       <main className="course-not-found">
         <p className="eyebrow"><span className="prompt-mark">&gt;</span> 404 / lesson not found</p>
@@ -514,21 +888,43 @@ function CourseActivityPage() {
     );
   }
 
-  const title = `${itemType === 'lecture' ? 'Lecture' : 'Quiz'} ${number}`;
+  const linuxChapter = course.slug === 'linux'
+    ? linuxLessons[selectedChapterNumber]
+    : null;
+  const linuxLesson = itemType === 'lecture'
+    ? linuxChapter?.lectures?.[number] ||
+      (number === 1 && linuxChapter?.pages ? linuxChapter : null)
+    : null;
+  const title = itemType === 'lecture'
+    ? linuxLesson?.title || chapter?.lectures[number - 1] || `Lecture ${number}`
+    : `Quiz ${number}`;
 
   return (
     <main className={`course-page course-theme-${course.slug}`}>
       <section className="course-detail activity-detail">
         <div className="course-detail-topline">
           <span>GITGOING / COURSES / {course.name.toUpperCase()}</span>
-          <span>{itemType.toUpperCase()} {String(number).padStart(2, '0')}</span>
+          <span>
+            {itemType.toUpperCase()} {String(number).padStart(2, '0')}
+            {course.chapters && ` / CHAPTER ${String(selectedChapterNumber).padStart(2, '0')}`}
+          </span>
         </div>
         <div className="activity-detail-content">
-          <p className="course-detail-kicker">{course.name} / CHAPTER 1</p>
-          <h1>{title}<span className="course-detail-cursor">_</span></h1>
-          <p className="course-detail-description">
-            {title} content for {course.name} will be available here.
+          <p className="course-detail-kicker">
+            {course.name} / {chapter?.title || `CHAPTER ${selectedChapterNumber.toString().padStart(2, '0')}`}
           </p>
+          <h1>{title}<span className="course-detail-cursor">_</span></h1>
+          {linuxLesson ? (
+            <LinuxLessonPager
+              key={`${selectedChapterNumber}-${number}`}
+              lessonPages={linuxLesson.pages}
+              onFinish={() => navigate(`/courses/${course.slug}`)}
+            />
+          ) : (
+            <p className="course-detail-description">
+              {title} content for {course.name} will be available here.
+            </p>
+          )}
           <Link className="course-back-link" to={`/courses/${course.slug}`}>
             <span aria-hidden="true">&lt;-</span> Back to {course.name}
           </Link>
@@ -920,6 +1316,10 @@ function SiteLayout() {
               onToggleTerminal={() => setTerminalOpen(false)}
             />
           }
+        />
+        <Route
+          path="/courses/:courseSlug/chapter/:chapterNumber/:itemType/:itemNumber"
+          element={<CourseActivityPage />}
         />
         <Route path="/courses/:courseSlug/:itemType/:itemNumber" element={<CourseActivityPage />} />
         <Route path="/courses/:courseSlug" element={<CoursePage />} />
