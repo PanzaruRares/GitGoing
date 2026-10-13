@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "server:dev": "node --watch server/index.js",
-    "test:server": "node --test server/models/User.test.js server/utils/passwords.test.js server/utils/tokens.test.js server/routes/assistant.test.js server/routes/quiz.test.js"
+    "test:server": "node --test server/models/User.test.js server/utils/passwords.test.js server/utils/tokens.test.js server/routes/assistant.test.js server/routes/quiz.test.js server/routes/progress.test.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

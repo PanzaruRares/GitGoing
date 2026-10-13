@@ -705,7 +705,20 @@ function TerminalPanel({ onExit }) {
   );
 }
 
-function ProfileDashboard({ apiBaseUrl }) {
+function ProfileDashboard({ signedIn }) {
+  const [completed] = useCompletedLectures();
+  const courseProgress = courses.map((course) => {
+    const total = course.chapters.reduce((sum, chapter) => sum + chapter.lectures.length, 0);
+    const done = course.chapters.reduce(
+      (sum, chapter, chapterIndex) => sum + chapter.lectures.filter((_, lectureIndex) => (
+        completed.includes(`${course.slug}/${chapterIndex + 1}/${lectureIndex + 1}`)
+      )).length,
+      0,
+    );
+    return { slug: course.slug, name: course.name, total, done, isComplete: total > 0 && done === total };
+  });
+  const coursesCompleted = courseProgress.filter(({ isComplete }) => isComplete).length;
+
   return (
     <aside className="profile-dashboard" aria-label="Your profile and learning statistics">
       <div className="profile-heading">
@@ -724,8 +737,33 @@ function ProfileDashboard({ apiBaseUrl }) {
       <div className="dashboard-stats">
         <article className="stat-card chapters-stat">
           <p className="stat-label">Course progress</p>
-          <strong>0</strong>
-          <span>chapters completed</span>
+          <strong>{coursesCompleted}</strong>
+          <span>of {courses.length} courses completed</span>
+          <ul className="course-progress-list">
+            {courseProgress.map(({ slug, name, total, done, isComplete }) => (
+              <li key={slug} className={isComplete ? 'is-complete' : ''}>
+                <div className="course-progress-row">
+                  <span>{name}</span>
+                  <span>{done}/{total} lectures</span>
+                </div>
+                <div
+                  className="course-progress-bar"
+                  role="progressbar"
+                  aria-label={`${name} progress`}
+                  aria-valuemin={0}
+                  aria-valuemax={total}
+                  aria-valuenow={done}
+                >
+                  <span style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+          {!signedIn && (
+            <small className="course-progress-note">
+              Log in to save your progress to your account.
+            </small>
+          )}
         </article>
 
         <article className="stat-card daily-stat">
@@ -794,7 +832,7 @@ function ProfileDashboard({ apiBaseUrl }) {
   );
 }
 
-function HomePage({ terminalOpen, onToggleTerminal }) {
+function HomePage({ terminalOpen, onToggleTerminal, signedIn }) {
   return (
     <main>
       <section className="hero" id="home">
@@ -836,7 +874,7 @@ function HomePage({ terminalOpen, onToggleTerminal }) {
               ))}
             </div>
           </div>
-          <ProfileDashboard apiBaseUrl={apiBaseUrl} />
+          <ProfileDashboard signedIn={signedIn} />
         </div>
       </section>
 
@@ -860,22 +898,86 @@ function readCompleted() {
   }
 }
 
-function useCompletedLectures() {
-  const [completed, setCompleted] = useState(readCompleted);
+const ProgressContext = React.createContext([[], () => {}, true]);
+
+function mergeCompleted(...lists) {
+  return [...new Set(lists.flat())];
+}
+
+function useProgressStore(accountUser) {
+  const [guestCompleted, setGuestCompleted] = useState(readCompleted);
+  const [accountCompleted, setAccountCompleted] = useState(null);
+  const saveQueue = useRef(Promise.resolve());
+  const accountId = accountUser?.id;
+
+  function saveToAccount(list) {
+    saveQueue.current = saveQueue.current
+      .then(() => fetch(`${apiBaseUrl}/api/progress`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: list }),
+      }))
+      .catch(() => {});
+    return saveQueue.current;
+  }
 
   useEffect(() => {
     const sync = (event) => {
-      if (!event.key || event.key === COMPLETED_KEY) setCompleted(readCompleted());
+      if (!event.key || event.key === COMPLETED_KEY) setGuestCompleted(readCompleted());
     };
     window.addEventListener('storage', sync);
     return () => window.removeEventListener('storage', sync);
   }, []);
 
+  useEffect(() => {
+    setAccountCompleted(null);
+    if (!accountId || !apiBaseUrl) return undefined;
+
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/progress`, {
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const { completed: saved } = await response.json();
+        // Progress ticked while logged out is moved into the account once, then cleared.
+        const local = readCompleted();
+        const merged = mergeCompleted(saved, local);
+        setAccountCompleted(merged);
+        if (local.length > 0) {
+          await saveToAccount(merged);
+          try {
+            localStorage.removeItem(COMPLETED_KEY);
+          } catch {
+            // Nothing to clean up if storage is unavailable.
+          }
+          setGuestCompleted([]);
+        }
+      } catch {
+        // Aborted or offline: leave progress unloaded so toggles cannot overwrite saved data.
+      }
+    })();
+    return () => controller.abort();
+  }, [accountId]);
+
   function toggle(id) {
-    setCompleted((current) => {
-      const next = current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id];
+    const flip = (current) => (current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id]);
+
+    if (accountId) {
+      if (accountCompleted === null) return;
+      const next = flip(accountCompleted);
+      setAccountCompleted(next);
+      saveToAccount(next);
+      return;
+    }
+
+    setGuestCompleted((current) => {
+      const next = flip(current);
       try {
         localStorage.setItem(COMPLETED_KEY, JSON.stringify(next));
       } catch {
@@ -885,16 +987,24 @@ function useCompletedLectures() {
     });
   }
 
-  return [completed, toggle];
+  const ready = !accountId || accountCompleted !== null;
+  return [accountId ? accountCompleted ?? [] : guestCompleted, toggle, ready];
+}
+
+function useCompletedLectures() {
+  return React.useContext(ProgressContext);
 }
 
 function CompletionCheckbox({ id, label, completed, onToggle }) {
+  const [, , ready] = useCompletedLectures();
+
   return (
     <label className="lecture-complete">
       <input
         type="checkbox"
         aria-label={`Mark ${label} complete`}
         checked={completed.includes(id)}
+        disabled={!ready}
         onChange={() => onToggle(id)}
       />
       <span>{completed.includes(id) ? 'Completed' : 'Mark complete'}</span>
@@ -1682,6 +1792,7 @@ function AccountDialog({ mode, onClose, onAuthenticated }) {
 function SiteLayout() {
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [accountUser, setAccountUser] = useState(null);
+  const progress = useProgressStore(accountUser);
   const [accountStatus, setAccountStatus] = useState(
     apiBaseUrl ? 'checking' : 'unavailable',
   );
@@ -1794,7 +1905,7 @@ function SiteLayout() {
   }
 
   return (
-    <>
+    <ProgressContext.Provider value={progress}>
       <header className="site-header">
         <Link className="brand" to="/" aria-label="GitGoing home">
           <span className="brand-mark" aria-hidden="true">&gt;_</span>
@@ -1857,6 +1968,7 @@ function SiteLayout() {
           path="/"
           element={
             <HomePage
+              signedIn={Boolean(accountUser)}
               terminalOpen={terminalOpen}
               onToggleTerminal={() => setTerminalOpen(false)}
             />
@@ -1886,7 +1998,7 @@ function SiteLayout() {
         </Link>
         <span>Learn by doing<span className="footer-cursor">_</span></span>
       </footer>
-    </>
+    </ProgressContext.Provider>
   );
 }
 

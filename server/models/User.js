@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema(
     passwordResetTokenExpiresAt: Date,
     avatarUrl: String,
     avatarPublicId: String,
+    completedLectures: {
+      type: [String],
+      default: [],
+      select: false,
+    },
   },
   { timestamps: true },
 );

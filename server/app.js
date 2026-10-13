@@ -11,6 +11,7 @@ import { EmailDeliveryError } from "./services/email.js";
 import { createAuthRouter } from "./routes/auth.js";
 import assistantRouter from "./routes/assistant.js";
 import quizRouter from "./routes/quiz.js";
+import { createProgressRouter } from "./routes/progress.js";
 
 export function createApp(clientOrigin, apiOrigin, sessionOptions) {
   const app = express();
@@ -28,6 +29,7 @@ export function createApp(clientOrigin, apiOrigin, sessionOptions) {
   );
   app.use("/api/assistant", express.json({ limit: "20kb" }));
   app.use("/api/quiz/lecture", express.json({ limit: "60kb" }));
+  app.use("/api/progress", express.json({ limit: "20kb" }));
   app.use(express.json({ limit: "10kb" }));
   app.use(express.urlencoded({ extended: false, limit: "1kb" }));
   app.use(
@@ -50,6 +52,7 @@ export function createApp(clientOrigin, apiOrigin, sessionOptions) {
   app.use("/api/auth", createAuthRouter(apiOrigin, clientOrigin));
   app.use("/api/assistant", assistantRouter());
   app.use("/api/quiz", quizRouter());
+  app.use("/api/progress", createProgressRouter(clientOrigin));
 
   app.use((error, _request, response, next) => {
     if (response.headersSent) {

@@ -1821,6 +1821,51 @@ a.chapter-resource:focus-visible {
   line-height: 1.4;
 }
 
+.course-progress-list {
+  grid-column: 1 / -1;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.course-progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.course-progress-list .is-complete .course-progress-row {
+  color: var(--green);
+}
+
+.course-progress-bar {
+  height: 4px;
+  background: var(--border);
+}
+
+.course-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transition: width 200ms ease;
+}
+
+.course-progress-list .is-complete .course-progress-bar span {
+  background: var(--green);
+}
+
+.course-progress-note {
+  grid-column: 1 / -1;
+  margin-top: 0.7rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
 .activity-heading {
   display: flex;
   justify-content: space-between;
