@@ -1113,8 +1113,6 @@ function CoursePage() {
                               >
                                 Quiz {lectureIndex + 1}
                               </Link>
-                            ) : course.allowQuizzes !== false ? (
-                              <div className="chapter-resource">Guided practice</div>
                             ) : null}
                           </div>
                         </li>
