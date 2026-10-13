@@ -553,11 +553,11 @@ const courses = [
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-const currentWeekStart = new Date(today);
-currentWeekStart.setDate(today.getDate() - today.getDay());
+const activityStart = new Date(today.getFullYear(), today.getMonth(), 1);
+activityStart.setDate(activityStart.getDate() - activityStart.getDay());
 
-const activityStart = new Date(currentWeekStart);
-activityStart.setDate(currentWeekStart.getDate() - 52 * 7);
+const activityEnd = new Date(activityStart);
+activityEnd.setDate(activityStart.getDate() + 53 * 7 - 1);
 
 const activityWeeks = Array.from({ length: 53 }, (_, week) => {
   const days = Array.from({ length: 7 }, (_, day) => {
@@ -798,7 +798,7 @@ function ProfileDashboard({ signedIn }) {
               <div
                 className="activity-heatmap"
                 role="img"
-                aria-label={`Learning activity over the past year: ${activeDays} active ${activeDays === 1 ? 'day' : 'days'}`}
+                aria-label={`Learning activity over the year: ${activeDays} active ${activeDays === 1 ? 'day' : 'days'}`}
               >
                 {activityWeeks.map(({ week, days }) => (
                   <div className="heatmap-week" key={week}>
@@ -823,7 +823,7 @@ function ProfileDashboard({ signedIn }) {
           </div>
 
           <div className="heatmap-range" aria-hidden="true">
-            <span>{activityStart.getFullYear()}</span><span>{today.getFullYear()}</span>
+            <span>{activityStart.getFullYear()}</span><span>{activityEnd.getFullYear()}</span>
           </div>
           <div className="heatmap-footer">
             <div className="heatmap-legend" aria-label="Activity level: no activity to more activity">
