@@ -900,10 +900,6 @@ function readCompleted() {
 
 const ProgressContext = React.createContext([[], () => {}, true]);
 
-function mergeCompleted(...lists) {
-  return [...new Set(lists.flat())];
-}
-
 function useProgressStore(accountUser) {
   const [guestCompleted, setGuestCompleted] = useState(readCompleted);
   const [accountCompleted, setAccountCompleted] = useState(null);
@@ -943,19 +939,8 @@ function useProgressStore(accountUser) {
         });
         if (!response.ok) return;
         const { completed: saved } = await response.json();
-        // Progress ticked while logged out is moved into the account once, then cleared.
-        const local = readCompleted();
-        const merged = mergeCompleted(saved, local);
-        setAccountCompleted(merged);
-        if (local.length > 0) {
-          await saveToAccount(merged);
-          try {
-            localStorage.removeItem(COMPLETED_KEY);
-          } catch {
-            // Nothing to clean up if storage is unavailable.
-          }
-          setGuestCompleted([]);
-        }
+        // Guest progress stays in this browser and is never mixed into the account.
+        setAccountCompleted(saved);
       } catch {
         // Aborted or offline: leave progress unloaded so toggles cannot overwrite saved data.
       }
