@@ -605,7 +605,9 @@ function VimPanel() {
   );
 }
 
-function TerminalPanel({ onExit }) {
+function TerminalPanel({ onExit, signedIn, userName }) {
+  const shownName = signedIn ? userName || 'Learner' : 'guest';
+  const shellUser = shownName.toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'user';
   const [history, setHistory] = useState([]);
   const [command, setCommand] = useState('');
   const inputRef = useRef(null);
@@ -628,11 +630,11 @@ function TerminalPanel({ onExit }) {
     let output = '';
 
     if (commandName === 'whoami') {
-      output = 'guest';
+      output = shownName;
     } else if (commandName === 'ls') {
       output = courses.map(({ name: courseName }) => courseName).join('  ');
     } else if (commandName === 'pwd') {
-      output = '/home/guest';
+      output = `/home/${shellUser}`;
     } else if (commandName === 'help') {
       output = 'Available commands: ls, whoami, pwd, cd <course>, cd .., clear, exit';
     } else if (commandName === 'clear') {
@@ -832,7 +834,7 @@ function ProfileDashboard({ signedIn }) {
   );
 }
 
-function HomePage({ terminalOpen, onToggleTerminal, signedIn }) {
+function HomePage({ terminalOpen, onToggleTerminal, signedIn, userName }) {
   return (
     <main>
       <section className="hero" id="home">
@@ -844,7 +846,7 @@ function HomePage({ terminalOpen, onToggleTerminal, signedIn }) {
           </a>
         </div>
         {terminalOpen
-          ? <TerminalPanel onExit={onToggleTerminal} />
+          ? <TerminalPanel onExit={onToggleTerminal} signedIn={signedIn} userName={userName} />
           : <VimPanel />}
       </section>
 
@@ -1950,6 +1952,7 @@ function SiteLayout() {
           element={
             <HomePage
               signedIn={Boolean(accountUser)}
+              userName={accountUser?.displayName || ''}
               terminalOpen={terminalOpen}
               onToggleTerminal={() => setTerminalOpen(false)}
             />
