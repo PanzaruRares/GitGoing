@@ -1937,10 +1937,7 @@ function SiteLayout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const accountMenuRef = useRef(null);
   const location = useLocation();
-  const activity = useActivityStore(
-    accountUser,
-    location.pathname.startsWith('/courses') || location.pathname.startsWith('/quiz'),
-  );
+  const activity = useActivityStore(accountUser, true);
   const navigate = useNavigate();
 
   useEffect(() => {
