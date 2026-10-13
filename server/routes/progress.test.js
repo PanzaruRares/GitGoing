@@ -1,6 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseCompleted } from "./progress.js";
+import { parseActivity, parseCompleted } from "./progress.js";
+
+test("parseActivity accepts per-day seconds", () => {
+  assert.deepEqual(parseActivity({ activity: { "2026-10-13": 600 } }), { "2026-10-13": 600 });
+});
+
+test("parseActivity rejects malformed input", () => {
+  assert.equal(parseActivity({ activity: { "today": 5 } }), null);
+  assert.equal(parseActivity({ activity: { "2026-10-13": -1 } }), null);
+  assert.equal(parseActivity({ activity: { "2026-10-13": 90000 } }), null);
+  assert.equal(parseActivity({ activity: { "2026-10-13": "9" } }), null);
+  assert.equal(parseActivity({ activity: [1] }), null);
+});
 
 test("parseCompleted accepts lecture ids and removes duplicates", () => {
   assert.deepEqual(

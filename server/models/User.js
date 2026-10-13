@@ -50,6 +50,12 @@ const userSchema = new mongoose.Schema(
       default: [],
       select: false,
     },
+    activity: {
+      type: Map,
+      of: Number,
+      default: {},
+      select: false,
+    },
   },
   { timestamps: true },
 );

@@ -675,18 +675,18 @@ function TerminalPanel({ onExit, signedIn, userName }) {
   return (
     <section className="terminal-window" aria-label="Interactive course navigation terminal">
       <div className="terminal-titlebar">
-        <span className="terminal-file">guest@gitgoing: ~</span>
+        <span className="terminal-file">{shellUser}@gitgoing: ~</span>
       </div>
       <div className="terminal-output" aria-live="polite">
         <p className="terminal-welcome">GitGoing shell — try <code>whoami</code>, <code>ls</code>, or <code>cd Java</code>.</p>
         {history.map(({ command: entered, output }, index) => (
           <div className="terminal-entry" key={`${index}-${entered}`}>
-            <p><span className="terminal-prompt">guest@gitgoing:~$</span> {entered}</p>
+            <p><span className="terminal-prompt">{shellUser}@gitgoing:~$</span> {entered}</p>
             {output && <p className="terminal-result">{output}</p>}
           </div>
         ))}
         <form className="terminal-form" onSubmit={submitCommand}>
-          <label className="terminal-prompt" htmlFor="terminal-command">guest@gitgoing:~$</label>
+          <label className="terminal-prompt" htmlFor="terminal-command">{shellUser}@gitgoing:~$</label>
           <input
             id="terminal-command"
             ref={inputRef}
@@ -709,6 +709,9 @@ function TerminalPanel({ onExit, signedIn, userName }) {
 
 function ProfileDashboard({ signedIn }) {
   const [completed] = useCompletedLectures();
+  const activity = React.useContext(ActivityContext);
+  const todaySeconds = activity[dayKey()] || 0;
+  const activeDays = Object.values(activity).filter((seconds) => seconds > 0).length;
   const courseProgress = courses.map((course) => {
     const total = course.chapters.reduce((sum, chapter) => sum + chapter.lectures.length, 0);
     const done = course.chapters.reduce(
@@ -774,7 +777,9 @@ function ProfileDashboard({ signedIn }) {
               <p className="stat-label">Daily activity</p>
               <h3>Learning activity</h3>
             </div>
-            <span className="activity-total">0 min today</span>
+            <span className="activity-total">
+              {todaySeconds <= 0 ? '0 min' : formatActivity(todaySeconds)} today
+            </span>
           </div>
 
           <div className="heatmap-wrap">
@@ -793,21 +798,24 @@ function ProfileDashboard({ signedIn }) {
               <div
                 className="activity-heatmap"
                 role="img"
-                aria-label="No learning activity recorded in the past year"
+                aria-label={`Learning activity over the past year: ${activeDays} active ${activeDays === 1 ? 'day' : 'days'}`}
               >
                 {activityWeeks.map(({ week, days }) => (
                   <div className="heatmap-week" key={week}>
-                    {days.map(({ date, day, level }) => (
-                      <span
-                        className={`heatmap-cell activity-level-${level}`}
-                        key={day}
-                        title={`${date.toLocaleDateString('en', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}: no activity`}
-                      />
-                    ))}
+                    {days.map(({ date, day }) => {
+                      const seconds = activity[dayKey(date)] || 0;
+                      return (
+                        <span
+                          className={`heatmap-cell activity-level-${activityLevel(seconds)}`}
+                          key={day}
+                          title={`${date.toLocaleDateString('en', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}: ${formatActivity(seconds)}`}
+                        />
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -901,6 +909,151 @@ function readCompleted() {
 }
 
 const ProgressContext = React.createContext([[], () => {}, true]);
+
+const ACTIVITY_KEY = 'gitgoing:activity';
+const ACTIVITY_TICK_SECONDS = 5;
+const ACTIVITY_IDLE_MS = 60 * 1000;
+const ActivityContext = React.createContext({});
+
+function dayKey(date = new Date()) {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function readActivity() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(ACTIVITY_KEY));
+    return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+  } catch {
+    return {};
+  }
+}
+
+function activityLevel(seconds = 0) {
+  const minutes = seconds / 60;
+  if (minutes <= 0) return 0;
+  if (minutes < 5) return 1;
+  if (minutes < 15) return 2;
+  if (minutes < 30) return 3;
+  return 4;
+}
+
+function formatActivity(seconds = 0) {
+  if (seconds <= 0) return 'no activity';
+  const minutes = Math.floor(seconds / 60);
+  return minutes < 1 ? 'under 1 min' : `${minutes} min`;
+}
+
+// Counts time spent reading lessons and quizzes while the tab is visible and the user is active.
+function useActivityStore(accountUser, tracking) {
+  const accountId = accountUser?.id;
+  const [guestActivity, setGuestActivity] = useState(readActivity);
+  const [accountActivity, setAccountActivity] = useState(null);
+  const lastInput = useRef(Date.now());
+  const dirty = useRef(false);
+  const latestAccount = useRef(null);
+
+  latestAccount.current = accountActivity;
+
+  function flush(keepalive = false) {
+    if (!accountId || !dirty.current || !latestAccount.current || !apiBaseUrl) return;
+    dirty.current = false;
+    fetch(`${apiBaseUrl}/api/progress/activity`, {
+      method: 'PUT',
+      credentials: 'include',
+      keepalive,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activity: latestAccount.current }),
+    }).catch(() => {
+      dirty.current = true;
+    });
+  }
+
+  useEffect(() => {
+    setAccountActivity(null);
+    dirty.current = false;
+    if (!accountId || !apiBaseUrl) return undefined;
+
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/progress/activity`, {
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const { activity } = await response.json();
+        setAccountActivity(activity);
+      } catch {
+        // Aborted or offline: keep it unloaded so a partial map never overwrites saved data.
+      }
+    })();
+    return () => controller.abort();
+  }, [accountId]);
+
+  useEffect(() => {
+    const markActive = () => {
+      lastInput.current = Date.now();
+    };
+    const events = ['pointerdown', 'pointermove', 'keydown', 'scroll', 'touchstart'];
+    events.forEach((name) => window.addEventListener(name, markActive, { passive: true }));
+    return () => events.forEach((name) => window.removeEventListener(name, markActive));
+  }, []);
+
+  useEffect(() => {
+    if (!tracking) return undefined;
+
+    const timer = setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      if (Date.now() - lastInput.current > ACTIVITY_IDLE_MS) return;
+
+      const key = dayKey();
+      const add = (current) => ({
+        ...current,
+        [key]: Math.min((current[key] || 0) + ACTIVITY_TICK_SECONDS, 24 * 60 * 60),
+      });
+
+      if (accountId) {
+        if (latestAccount.current === null) return;
+        dirty.current = true;
+        setAccountActivity(add);
+        return;
+      }
+
+      setGuestActivity((current) => {
+        const next = add(current);
+        try {
+          localStorage.setItem(ACTIVITY_KEY, JSON.stringify(next));
+        } catch {
+          // Storage can be unavailable (private mode); activity still shows for this visit.
+        }
+        return next;
+      });
+    }, ACTIVITY_TICK_SECONDS * 1000);
+
+    return () => clearInterval(timer);
+  }, [tracking, accountId]);
+
+  useEffect(() => {
+    if (!accountId) return undefined;
+    const timer = setInterval(() => flush(), 30 * 1000);
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') flush(true);
+    };
+    const onPageHide = () => flush(true);
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
+      flush(true);
+    };
+  }, [accountId]);
+
+  return accountId ? accountActivity ?? {} : guestActivity;
+}
 
 function useProgressStore(accountUser) {
   const [guestCompleted, setGuestCompleted] = useState(readCompleted);
@@ -1784,6 +1937,10 @@ function SiteLayout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const accountMenuRef = useRef(null);
   const location = useLocation();
+  const activity = useActivityStore(
+    accountUser,
+    location.pathname.startsWith('/courses') || location.pathname.startsWith('/quiz'),
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -1889,6 +2046,7 @@ function SiteLayout() {
 
   return (
     <ProgressContext.Provider value={progress}>
+      <ActivityContext.Provider value={activity}>
       <header className="site-header">
         <Link className="brand" to="/" aria-label="GitGoing home">
           <span className="brand-mark" aria-hidden="true">&gt;_</span>
@@ -1982,6 +2140,7 @@ function SiteLayout() {
         </Link>
         <span>Learn by doing<span className="footer-cursor">_</span></span>
       </footer>
+      </ActivityContext.Provider>
     </ProgressContext.Provider>
   );
 }
