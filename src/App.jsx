@@ -9,6 +9,7 @@ import javaLessons from './javaLessons.jsx';
 import cppLessons from './cppLessons.jsx';
 import programmingLessons from './programmingLessons.jsx';
 import ChatAssistant from './ChatAssistant.jsx';
+import QuizMaker from './QuizMaker.jsx';
 import {
   SiCplusplus,
   SiCss,
@@ -704,7 +705,7 @@ function TerminalPanel({ onExit }) {
   );
 }
 
-function ProfileDashboard() {
+function ProfileDashboard({ apiBaseUrl }) {
   return (
     <aside className="profile-dashboard" aria-label="Your profile and learning statistics">
       <div className="profile-heading">
@@ -726,6 +727,8 @@ function ProfileDashboard() {
           <strong>0</strong>
           <span>chapters completed</span>
         </article>
+
+        <QuizMaker apiBaseUrl={apiBaseUrl} />
 
         <article className="stat-card daily-stat">
           <div className="activity-heading">
@@ -835,7 +838,7 @@ function HomePage({ terminalOpen, onToggleTerminal }) {
               ))}
             </div>
           </div>
-          <ProfileDashboard />
+          <ProfileDashboard apiBaseUrl={apiBaseUrl} />
         </div>
       </section>
 

@@ -10,6 +10,7 @@ import healthRouter from "./routes/health.js";
 import { EmailDeliveryError } from "./services/email.js";
 import { createAuthRouter } from "./routes/auth.js";
 import assistantRouter from "./routes/assistant.js";
+import quizRouter from "./routes/quiz.js";
 
 export function createApp(clientOrigin, apiOrigin, sessionOptions) {
   const app = express();
@@ -47,6 +48,7 @@ export function createApp(clientOrigin, apiOrigin, sessionOptions) {
   app.use("/api/health", healthRouter);
   app.use("/api/auth", createAuthRouter(apiOrigin, clientOrigin));
   app.use("/api/assistant", assistantRouter());
+  app.use("/api/quiz", quizRouter());
 
   app.use((error, _request, response, next) => {
     if (response.headersSent) {

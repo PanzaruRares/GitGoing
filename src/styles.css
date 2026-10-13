@@ -1436,6 +1436,267 @@ a.chapter-resource:focus-visible {
   background: var(--background);
 }
 
+.quiz-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.quiz-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.quiz-dropzone {
+  position: relative;
+  border: 1px dashed var(--border);
+  background: var(--surface);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.quiz-dropzone.is-dragging {
+  border-color: var(--cyan);
+  background: var(--surface-raised);
+}
+
+.quiz-dropzone.has-file {
+  border-style: solid;
+  border-color: var(--cyan);
+}
+
+.quiz-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.quiz-file-input:focus-visible + .quiz-drop-label {
+  outline: 2px solid var(--cyan);
+  outline-offset: -4px;
+}
+
+.quiz-drop-label {
+  min-height: 96px;
+  display: grid;
+  place-content: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  color: var(--text);
+  text-align: center;
+  cursor: pointer;
+}
+
+.quiz-drop-hint,
+.quiz-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.quiz-note {
+  margin: 0;
+}
+
+.quiz-file {
+  min-height: 96px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.8rem;
+  padding: 1rem;
+}
+
+.quiz-file strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.quiz-file span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.quiz-button {
+  justify-self: start;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--cyan);
+  background: var(--cyan);
+  color: var(--background);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quiz-button:hover:not(:disabled) {
+  background: transparent;
+  color: var(--cyan);
+}
+
+.quiz-button:disabled {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.quiz-button-secondary {
+  background: transparent;
+  color: var(--cyan);
+}
+
+.quiz-button:focus-visible,
+.quiz-link:focus-visible,
+.quiz-option:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+
+.quiz-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pink);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.quiz-error {
+  margin: 0;
+  color: var(--pink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.quiz-progress-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.quiz-progress-row .stat-label {
+  margin: 0;
+}
+
+.quiz-progress {
+  height: 4px;
+  background: var(--surface-raised);
+}
+
+.quiz-progress span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transition: width 200ms ease;
+}
+
+.quiz-options {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.quiz-option {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--cyan);
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.quiz-letter {
+  color: var(--pink);
+  font-weight: 700;
+}
+
+.quiz-option.is-correct {
+  border-color: var(--green);
+  background: rgba(168, 209, 141, 0.12);
+}
+
+.quiz-option.is-wrong {
+  border-color: var(--pink);
+  background: rgba(229, 138, 199, 0.12);
+}
+
+.quiz-feedback {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.quiz-feedback.is-correct {
+  color: var(--green);
+}
+
+.quiz-feedback.is-wrong {
+  color: var(--pink);
+}
+
+.quiz-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.quiz-score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.quiz-score strong {
+  color: var(--cyan);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.quiz-review summary {
+  color: var(--cyan);
+  cursor: pointer;
+}
+
+.quiz-review ol {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0.8rem 0 0;
+  padding-left: 1.4rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.quiz-review p {
+  margin: 0 0 0.25rem;
+}
+
+.quiz-review-answer {
+  color: var(--green);
+}
+
+.quiz-review-note {
+  color: var(--muted);
+}
+
 .chapters-stat {
   min-height: 104px;
   display: grid;

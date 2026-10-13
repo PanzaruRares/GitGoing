@@ -67,6 +67,18 @@ information. The static GitHub Pages deployment does not run the Express API;
 using the assistant there requires deploying the API and setting `VITE_API_URL`
 to its public address at frontend build time.
 
+## Quiz maker
+
+The dashboard has a **Quiz maker** card. Drag in (or browse for) a `.pdf` or
+`.docx` file of up to 5 MB and press **Make quiz** to get 20 multiple-choice
+questions (A to D) with instant feedback, explanations, and a score. The server
+extracts the document text (older `.doc` files and scanned PDFs are not
+supported), sends up to the first 30,000 characters to Gemini using the same
+`GEMINI_API_KEY` and model settings as GitBuddy, and does not store the file.
+Requests are limited to four per minute per client. Document text is sent to
+Google, and the free tier may use it to improve Google products, so avoid
+sensitive files.
+
 ## Terminal navigation
 
 Choose **Terminal** in the site navigation to replace the Vim preview with the
