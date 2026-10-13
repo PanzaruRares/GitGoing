@@ -121,7 +121,7 @@ export function createAssistantRouter({
       learner_question: question,
     });
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45000);
+    const timeout = setTimeout(() => controller.abort(), 55000);
 
     const modelsToTry = [model, "gemini-3.1-flash-lite"].filter(
       (m, idx, arr) => Boolean(m) && arr.indexOf(m) === idx,
@@ -132,7 +132,11 @@ export function createAssistantRouter({
       let lastStatus = 0;
       let lastErrorText = "";
 
-      for (const targetModel of modelsToTry) {
+      const attempts = [...modelsToTry, ...modelsToTry, ...modelsToTry];
+      for (const [attemptIndex, targetModel] of attempts.entries()) {
+        if (attemptIndex >= modelsToTry.length) {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+        }
         const requestBody = JSON.stringify({
           model: targetModel,
           store: false,
@@ -151,7 +155,7 @@ export function createAssistantRouter({
         });
 
         const attemptController = new AbortController();
-        const attemptTimer = setTimeout(() => attemptController.abort(), 7000);
+        const attemptTimer = setTimeout(() => attemptController.abort(), 15000);
         const onParentAbort = () => attemptController.abort();
         controller.signal.addEventListener("abort", onParentAbort);
 
@@ -169,6 +173,7 @@ export function createAssistantRouter({
           console.warn(
             `Gemini request with model ${targetModel} failed to connect: ${fetchErr.message}`,
           );
+          upstream = undefined;
           continue;
         } finally {
           clearTimeout(attemptTimer);
@@ -185,8 +190,11 @@ export function createAssistantRouter({
           `Gemini request with model ${targetModel} failed (${upstream.status}): ${lastErrorText}`,
         );
 
-        if (upstream.status === 401 || upstream.status === 403) {
-          // Authentication error is not model-specific
+        if (
+          upstream.status === 401 ||
+          upstream.status === 403 ||
+          upstream.status === 400
+        ) {
           break;
         }
       }
