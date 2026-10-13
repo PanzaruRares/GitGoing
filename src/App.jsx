@@ -849,9 +849,63 @@ function HomePage({ terminalOpen, onToggleTerminal }) {
   );
 }
 
+const COMPLETED_KEY = 'gitgoing:completed-lectures';
+
+function readCompleted() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(COMPLETED_KEY));
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    return [];
+  }
+}
+
+function useCompletedLectures() {
+  const [completed, setCompleted] = useState(readCompleted);
+
+  useEffect(() => {
+    const sync = (event) => {
+      if (!event.key || event.key === COMPLETED_KEY) setCompleted(readCompleted());
+    };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+
+  function toggle(id) {
+    setCompleted((current) => {
+      const next = current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id];
+      try {
+        localStorage.setItem(COMPLETED_KEY, JSON.stringify(next));
+      } catch {
+        // Storage can be unavailable (private mode); the checkbox still works for this visit.
+      }
+      return next;
+    });
+  }
+
+  return [completed, toggle];
+}
+
+function CompletionCheckbox({ id, label, completed, onToggle }) {
+  return (
+    <label className="lecture-complete">
+      <input
+        type="checkbox"
+        aria-label={`Mark ${label} complete`}
+        checked={completed.includes(id)}
+        onChange={() => onToggle(id)}
+      />
+      <span>{completed.includes(id) ? 'Completed' : 'Mark complete'}</span>
+    </label>
+  );
+}
+
 function CoursePage() {
   const { courseSlug } = useParams();
   const [selectedChapter, setSelectedChapter] = useState(null);
+  const [completed, toggleCompleted] = useCompletedLectures();
   const course = courses.find(({ slug }) => slug === courseSlug);
 
   if (!course) {
@@ -940,6 +994,12 @@ function CoursePage() {
                                   : 'Learn & check'}
                             </span>
                           </h3>
+                          <CompletionCheckbox
+                            id={`${course.slug}/${index + 1}/${lectureIndex + 1}`}
+                            label={lecture}
+                            completed={completed}
+                            onToggle={toggleCompleted}
+                          />
                           <div className="chapter-group-resources">
                             <Link
                               className="chapter-resource lecture-resource"
@@ -1317,6 +1377,7 @@ function LinuxLessonPager({ onFinish, lessonPages }) {
 function CourseActivityPage() {
   const { courseSlug, chapterNumber, itemType, itemNumber } = useParams();
   const navigate = useNavigate();
+  const [completed, toggleCompleted] = useCompletedLectures();
   const course = courses.find(({ slug }) => slug === courseSlug);
   const number = Number(itemNumber);
   const selectedChapterNumber = chapterNumber ? Number(chapterNumber) : 1;
@@ -1391,6 +1452,14 @@ function CourseActivityPage() {
             <p className="course-detail-description">
               {title} content for {course.name} will be available here.
             </p>
+          )}
+          {currentLesson && (
+            <CompletionCheckbox
+              id={`${course.slug}/${selectedChapterNumber}/${number}`}
+              label={title}
+              completed={completed}
+              onToggle={toggleCompleted}
+            />
           )}
           <Link className="course-back-link" to={`/courses/${course.slug}`}>
             <span aria-hidden="true">&lt;-</span> Back to {course.name}
