@@ -1076,7 +1076,7 @@ function CoursePage() {
                       <ol className="chapter-sequence">
                       {chapter.lectures.map((lecture, lectureIndex) => (
                         <li
-                          className={`chapter-group${course.allowQuizzes !== false && lectureIndex === chapter.lectures.length - 1 ? ' final-chapter-group' : ''}`}
+                          className={`chapter-group`}
                           key={lecture}
                         >
                           <h3>
@@ -1113,8 +1113,6 @@ function CoursePage() {
                               >
                                 Quiz {lectureIndex + 1}
                               </Link>
-                            ) : course.allowQuizzes !== false && lectureIndex === chapter.lectures.length - 1 ? (
-                              <div className="chapter-resource chapter-test">Chapter Test</div>
                             ) : course.allowQuizzes !== false ? (
                               <div className="chapter-resource">Guided practice</div>
                             ) : null}

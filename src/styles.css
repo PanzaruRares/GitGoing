@@ -872,17 +872,8 @@ a.chapter-resource:focus-visible {
   outline-offset: 2px;
 }
 
-.chapter-test {
-  color: var(--course-text);
-}
-
-.final-chapter-group .chapter-test {
-  border-color: color-mix(in srgb, var(--course-accent) 65%, transparent);
-}
-
 .lecture-resource::before,
-.quiz-resource::before,
-.chapter-test::before {
+.quiz-resource::before {
   display: block;
   margin-bottom: 0.4rem;
   color: var(--course-accent);
@@ -901,10 +892,6 @@ a.chapter-resource:focus-visible {
 
 .quiz-resource::before {
   content: "QUIZ";
-}
-
-.chapter-test::before {
-  content: "FINAL ASSESSMENT";
 }
 
 .activity-detail {
@@ -1212,7 +1199,6 @@ a.chapter-resource:focus-visible {
 .course-theme-java .chapter-group h3,
 .course-theme-java .lecture-resource::before,
 .course-theme-java .quiz-resource::before,
-.course-theme-java .chapter-test::before,
 .course-theme-java .course-back-link {
   color: var(--course-accent-text);
 }
