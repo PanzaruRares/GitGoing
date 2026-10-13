@@ -728,8 +728,6 @@ function ProfileDashboard({ apiBaseUrl }) {
           <span>chapters completed</span>
         </article>
 
-        <QuizMaker apiBaseUrl={apiBaseUrl} />
-
         <article className="stat-card daily-stat">
           <div className="activity-heading">
             <div>
@@ -1729,6 +1727,7 @@ function SiteLayout() {
           <button className="terminal-nav-button" type="button" onClick={toggleTerminal}>
             {terminalOpen && location.pathname === '/' ? 'Vim editor' : 'Terminal'}
           </button>
+          <Link className="terminal-nav-button" to="/quiz">Quiz Maker</Link>
         </nav>
         <details className="account-menu" ref={accountMenuRef}>
           <summary className="account-trigger">
@@ -1784,6 +1783,14 @@ function SiteLayout() {
               terminalOpen={terminalOpen}
               onToggleTerminal={() => setTerminalOpen(false)}
             />
+          }
+        />
+        <Route
+          path="/quiz"
+          element={
+            <main className="quiz-page">
+              <QuizMaker apiBaseUrl={apiBaseUrl} />
+            </main>
           }
         />
         <Route
