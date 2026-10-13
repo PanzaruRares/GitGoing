@@ -123,7 +123,7 @@ export function createAssistantRouter({
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 55000);
 
-    const modelsToTry = [model, "gemini-3.1-flash-lite"].filter(
+    const modelsToTry = [model, "gemini-3.1-flash-lite-preview", "gemini-3.1-flash-lite"].filter(
       (m, idx, arr) => Boolean(m) && arr.indexOf(m) === idx,
     );
 
