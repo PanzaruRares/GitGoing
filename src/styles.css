@@ -1668,6 +1668,72 @@ a.chapter-resource:focus-visible {
   gap: 0.6rem;
 }
 
+.quiz-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.quiz-tab {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.quiz-tab.is-active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.quiz-picker {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.quiz-picker label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.quiz-picker select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.quiz-help {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  justify-items: start;
+}
+
+.quiz-help-answer {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  font-size: 0.85rem;
+}
+
+.quiz-help-answer p {
+  margin: 0.3rem 0 0;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .quiz-score {
   display: flex;
   align-items: baseline;

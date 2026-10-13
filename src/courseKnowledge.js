@@ -85,6 +85,33 @@ function scorePage(page, terms, question, preferredCourse) {
   return score;
 }
 
+export function getLectureCatalog() {
+  return courseSources.map(({ name, slug, lessons }) => ({
+    name,
+    slug,
+    chapters: Object.entries(lessons || {}).map(([chapterNumber, chapter]) => {
+      const lectureEntries = chapter.lectures
+        ? Object.entries(chapter.lectures)
+        : [['1', chapter]];
+
+      return {
+        number: chapterNumber,
+        title: chapter.title || 'Course material',
+        lectures: lectureEntries.map(([lectureNumber, lecture]) => ({
+          number: lectureNumber,
+          title: lecture.title || `Lecture ${lectureNumber}`,
+          text: (lecture.pages || [])
+            .map((page) => `${page.title || ''}\n${textFromContent(page.content)}`)
+            .join('\n\n')
+            .replace(/[ \t]+/g, ' ')
+            .replace(/\s*\n\s*/g, '\n')
+            .trim(),
+        })),
+      };
+    }),
+  }));
+}
+
 export function findRelevantCoursePages(question, preferredCourse = '') {
   const terms = getQueryTerms(question);
   if (terms.length === 0) return [];

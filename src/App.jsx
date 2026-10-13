@@ -1395,6 +1395,14 @@ function CourseActivityPage() {
           <Link className="course-back-link" to={`/courses/${course.slug}`}>
             <span aria-hidden="true">&lt;-</span> Back to {course.name}
           </Link>
+          {currentLesson && (
+            <Link
+              className="course-back-link"
+              to={`/quiz?course=${course.slug}&chapter=${selectedChapterNumber}&lecture=${number}`}
+            >
+              Take the quiz for this lecture <span aria-hidden="true">-&gt;</span>
+            </Link>
+          )}
         </div>
       </section>
     </main>

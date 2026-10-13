@@ -175,3 +175,55 @@ test("parseQuiz rejects malformed questions and trims extras", () => {
 
   assert.equal(parseQuiz(JSON.stringify(makeQuiz(25))).length, QUESTION_COUNT);
 });
+
+async function startLectureServer(options = {}) {
+  const app = express();
+  app.use(
+    "/api/quiz",
+    createQuizRouter({
+      generate: options.generate ?? (async () => JSON.stringify(makeQuiz())),
+      limit: 50,
+    }),
+  );
+  const server = app.listen(0, "127.0.0.1");
+  servers.push(server);
+  await once(server, "listening");
+  const { port } = server.address();
+  return (body) => fetch(`http://127.0.0.1:${port}/api/quiz/lecture`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+test("builds an easy 20-question quiz from lecture text and caches it", async () => {
+  let calls = 0;
+  let upstream;
+  const options = {
+    generate: async (args) => {
+      calls += 1;
+      upstream = args;
+      return JSON.stringify(makeQuiz());
+    },
+  };
+  const payload = { title: "Variables", text: LOREM };
+  const post = await startLectureServer(options);
+  const first = await post(payload);
+  const firstBody = await first.json();
+
+  assert.equal(first.status, 200);
+  assert.equal(firstBody.questions.length, QUESTION_COUNT);
+  assert.match(upstream.systemInstruction, /easy/i);
+  assert.equal(JSON.parse(upstream.input).title, "Variables");
+
+  const repeat = await post(payload);
+  assert.equal(repeat.status, 200);
+  assert.equal(calls, 1);
+});
+
+test("rejects lecture requests with missing or tiny text", async () => {
+  const post = await startLectureServer();
+  assert.equal((await post({ title: "", text: LOREM })).status, 400);
+  assert.equal((await post({ title: "A", text: 5 })).status, 400);
+  assert.equal((await post({ title: "A", text: "short" })).status, 422);
+});

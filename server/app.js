@@ -27,6 +27,7 @@ export function createApp(clientOrigin, apiOrigin, sessionOptions) {
     }),
   );
   app.use("/api/assistant", express.json({ limit: "20kb" }));
+  app.use("/api/quiz/lecture", express.json({ limit: "60kb" }));
   app.use(express.json({ limit: "10kb" }));
   app.use(express.urlencoded({ extended: false, limit: "1kb" }));
   app.use(

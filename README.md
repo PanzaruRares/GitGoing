@@ -69,10 +69,19 @@ to its public address at frontend build time.
 
 ## Quiz maker
 
-The dashboard has a **Quiz maker** card. Drag in (or browse for) a `.pdf` or
-`.docx` file of up to 5 MB and press **Make quiz** to get 20 multiple-choice
-questions (A to D) with instant feedback, explanations, and a score. The server
-extracts the document text (older `.doc` files and scanned PDFs are not
+The **Quiz Maker** tab builds 20-question multiple-choice quizzes (A to D) with
+instant feedback, explanations, and a score. There are two sources:
+
+- **Course lectures:** pick a course, chapter, and lecture. Gemini writes an easy
+  beginner-level quiz from that lecture's text. Every lecture page also links to
+  its quiz. Generated lecture quizzes are cached in server memory to save quota.
+- **Upload a document:** drag in a `.pdf` or `.docx` file of up to 5 MB.
+
+When you answer a question wrong, **Ask GitBuddy why** sends the question, your
+answer, and the correct answer to GitBuddy (with matching lesson excerpts for
+lecture quizzes) and shows the explanation under the question.
+
+The server extracts the document text (older `.doc` files and scanned PDFs are not
 supported), sends up to the first 30,000 characters to Gemini using the same
 `GEMINI_API_KEY` and model settings as GitBuddy, and does not store the file.
 Requests are limited to four per minute per client. Document text is sent to
